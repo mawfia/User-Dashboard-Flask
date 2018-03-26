@@ -52,6 +52,7 @@ def authenticate(destination):
     elif destination: return redirect(destination)
 
 def validateName(fname, lname):
+    print(fname + " " + lname)
     if not NAME_REGEX.match(fname) or not NAME_REGEX.match(lname):
         flash("First and last name must be 2-20 characters and contain only letters a-z.")
         return 1
@@ -80,7 +81,7 @@ def validatePassword(password, cpassword):
 
 def validateBirthdate(ubdate): # takes unicoded birthdate as input
     date = datetime.datetime.fromtimestamp(time.time()).strftime('%m/%d/%Y').split('/') # todays date
-    ebdate = ubdate.encode('ascii').split('-') #encoded birthdate
+    ebdate = ubdate.split('-') #encoded birthdate
 
     errors = 0
     if datetime.datetime(int(date[2])-18,int(date[0]),int(date[1])) <= datetime.datetime(int(ebdate[0]), int(ebdate[1]), int(ebdate[2])):
@@ -110,17 +111,6 @@ def deSHPassword(password, shpassword, salt):
     if shpassword == md5((password + salt).encode('utf-8')).hexdigest() : return True
     else: return False
 
-def showUser(user_id):
-    query = "SELECT id, first_name, last_name, email, DATE_FORMAT(birthdate, '%Y-%m-%d') AS birthdate, permission_level, created_at, updated_at FROM users WHERE id = :id"
-    data = {'id':user_id}
-    result = mysql.query_db(query, data)
-
-
-    if len(result) != 0 :
-        result[0]['permission_level'] = permissions(result[0]['permission_level'])
-        return result[0]
-    else: return []
-
 @app.route('/user/<user_id>')
 def showOtherUser(user_id):
     if session.get('user_id') == None: return redirect('/')
@@ -133,12 +123,7 @@ def showOtherUser(user_id):
 def showUsers():
     if session.get('user_id') == None: return redirect('/')
 
-    query = "SELECT id, first_name, last_name, email, DATE_FORMAT(birthdate, '%Y-%m-%d') AS birthdate, permission_level, DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at, DATE_FORMAT(updated_at, '%Y-%m-%d') AS updated_at FROM users"
-    users = mysql.query_db(query, data=None)
-    for user in users:
-        user['permission_level'] = permissions(user['permission_level'])
-
-    return render_template('users.html', users=users)
+    return render_template('users.html', users=User.showUsers())
 
 @app.route('/user/create', methods=['GET'])
 def createUser1():
@@ -190,7 +175,7 @@ def updateUser(user_id):
     errors += validateBirthdate(request.form['bdate'])
 
     if errors == 0:
-        if session['permission_level'] >= 2:
+        if session['permission_level'][0] >= 2:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate, permission_level = :permission_level WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'permission_level': request.form['permission_level'], 'id': user_id, }
         else:
@@ -203,7 +188,6 @@ def updateUser(user_id):
 
 @app.route('/login', methods=['POST'])
 def login():
-  print(test.permission_level)
 
   errors = 0
   if not EMAIL_REGEX.match(request.form['email']):
