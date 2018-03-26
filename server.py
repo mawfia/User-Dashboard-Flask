@@ -1,7 +1,7 @@
 import re
 import time
 import datetime
-import md5
+import hashlib
 import os, binascii
 
 from flask import Flask, render_template, request, redirect, session, flash
@@ -189,7 +189,6 @@ def updateUser(user_id):
         if session['permission_level'] >= 2:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate, permission_level = :permission_level WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'permission_level': request.form['permission_level'], 'id': user_id, }
-            print request.form['permission_level']
         else:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'id': user_id, }
@@ -299,6 +298,5 @@ def createComment(message_id):
 @app.route('/<path:path>')
 @app.route('/register/<path:path>')
 def error(path):
-    print path
     return redirect('/')
 app.run(debug=True)
