@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>Login/Registration Form</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+      <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+   </head>
+   <body>
+       <div id="select"><h2>Select Login or register:</h2><button type="button">Login</button><button type="button">Register</button></div>
+       <div id="register" hidden>
+           <h1>Registration Form</h1>
+           <form action='/register' method='POST'>
+               <label for="fname">First Name:</label><input type='text' name='fname' value="{{fname}}">
+               <label for="lname">Last Name:</label><input type='text' name='lname' value="{{lname}}">
+               <label for="email">Email:</label><input type='email' name='email' value="{{email}}" placeholder="username">
+               <label for="password">Password:</label><input type='password' name='password'>
+               <label for"cpassword">Confirm Password:</label><input type='password' name='cpassword'>
+               <label for"bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
+               <input type='submit' value='Register'><input type="reset" value="Reset">
+           </form>
+       </div>
+       <div id="create" hidden>
+           <h1>New User Form</h1>
+           <form action='/user/create' method='POST'>
+               <label for="fname">First Name:</label><input type='text' name='fname' value="{{fname}}">
+               <label for="lname">Last Name:</label><input type='text' name='lname' value="{{lname}}">
+               <label for="email">Email:</label><input type='email' name='email' value="{{email}}" placeholder="username">
+               <label for="password">Password:</label><input type='password' name='password'>
+               <label for"cpassword">Confirm Password:</label><input type='password' name='cpassword'>
+               <label for"bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
+               {% if session['permission_level'][0] > 2 %}
+               {% set permissions = [[0,'Guest'],[1,'Basic'],[2,'Admin Level 1'],[3,'Admin Level 2']] %}
+                 <label for="permission_level">Permission Level:</label>
+                 <select name="permission_level">
+                   {% for i in range(session['permission_level'][0]+1) %}
+                     <option value="{{permissions[i][0]}}">{{permissions[i][0]}} - {{permissions[i][1]}}</option>
+                   {% endfor %}
+                 </select>
+               {% endif %}
+               <input type='submit' value='Register'><input type="reset" value="Reset"><a href="/users">Cancel</a>
+           </form>
+       </div>
+       <div id="login" hidden>
+           <h1>Login Form</h1>
+           <form action='/login' method='POST'>
+               <label for="email">Email:</label><input type="email" name="email" value="{{email}}">
+               <label for="password">Password:</label><input type="password" name="password">
+               <input type='submit' value='Login'><input type="reset" value="Reset">
+           </form>
+       </div>
+       {% with messages = get_flashed_messages() %}
+       {% if messages %}
+            {% for message in messages %}
+            <p>{{message}}</p>
+            {% endfor %}
+       {% endif %}
+       {% endwith %}
+       <span hidden>{{create}}</span>
+   </body>
+</html>

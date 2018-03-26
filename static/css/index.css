@@ -1,0 +1,42 @@
+#select{
+    text-align: center;
+}
+
+#register form, #create form{
+    width: 300px;
+    height: auto;
+}
+
+input{
+    margin-top: 15px;
+}
+
+#register input:nth-of-type(1), #create input:nth-of-type(1){
+    margin-left: 65px;
+}
+
+#register input:nth-of-type(2), #create input:nth-of-type(2){
+    margin-left: 67px;
+}
+
+#register input:nth-of-type(3), #create input:nth-of-type(3){
+    margin-left: 98px;
+}
+
+#register input:nth-of-type(4), #create input:nth-of-type(4){
+    margin-left: 74px;
+}
+
+#register input:nth-of-type(5), #create input:nth-of-type(5){
+    margin-left: 17px;
+}
+
+#register input:nth-of-type(6), #create input:nth-of-type(6){
+    margin-left: 73px;
+}
+
+select{
+  margin: 15px 0px 0px 17px;
+  width: 130px;
+  height: 16px;
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>User Account</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/user.css') }}">
+      <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/user.js') }}"></script>
+   </head>
+   <body>
+     <div id="user">
+       <h1>User Account Information:</h1>
+       <table>
+         <tbody>
+           <tr><td>First Name:</td><td>{{user['first_name']}}</td></tr>
+           <tr><td>Last Name:</td><td>{{user['last_name']}}</td></tr>
+           <tr><td>Email:</td><td>{{user['email']}}</td></tr>
+           <tr><td>Birthdate:</td><td>{{user['birthdate']}}</td></tr>
+           <tr><td>Permission Level:</td><td>{{user['permission_level'][1]}}</td></tr>
+           <tr><td>Creation Date:</td><td>{{user['created_at']}}</td></tr>
+           <tr><td>Last Visit:</td><td>{{user['updated_at']}}</td></tr>
+         </tbody>
+         <tfoot>
+           <tr>
+             {% if session['user_id'] == user['id'] or session['permission_level'][0] > 1 %}<th><button type="button">Update</button></th>{% endif %}
+             {% if session['user_id'] == user['id'] or session['permission_level'][0] > 2 %}
+                <th><form action="/user/{{user['id']}}/delete" method="GET"><input type="submit" value="Delete"></form>
+             {% endif %}
+           </tr>
+         </tfoot>
+       </table>
+    </div>
+    <div id="update" hidden>
+      <h1>Update {{user['first_name']}} {{user['last_name']}} Account Information:</h1>
+      <form action='/user/{{user['id']}}/update' method='POST'>
+          <label for="fname">First Name:</label><input type='text' name='fname' value="{{user['first_name']}}">
+          <label for="lname">Last Name:</label><input type='text' name='lname' value="{{user['last_name']}}">
+          <label for="email">Email:</label><input type='email' name='email' value="{{user['email']}}">
+          <label for"bdate">Birthdate:</label><input type="date" name="bdate" value="{{user['birthdate']}}" required>
+          {% if session['permission_level'][0] > 2 %}
+          {% set permissions = [[0,'Guest'],[1,'Basic'],[2,'Admin Level 1'],[3,'Admin Level 2']] %}
+            <label for="permission_level">Permission Level:</label>
+            <select name="permission_level">
+              {% for i in range(session['permission_level'][0]+1) %}
+                <option value="{{permissions[i][0]}}">{{permissions[i][0]}} - {{permissions[i][1]}}</option>
+              {% endfor %}
+            </select>
+          {% endif %}
+          <input type='submit' value='Submit'><input type="reset" value="Reset"><button type="button">Cancel</button>
+      </form>
+   </div>
+    <a href="/logout">Logout</a><a href="/wall">The Wall</a><a href="/users">User Accounts</a>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+         {% for message in messages %}
+         <p>{{message}}</p>
+         {% endfor %}
+    {% endif %}
+    {% endwith %}
+   </body>
+</html>

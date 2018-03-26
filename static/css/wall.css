@@ -1,0 +1,42 @@
+#nav h1, h3{
+  display: inline-block;
+}
+
+#top{
+  width: 800px;
+  height: 125px;
+  margin: auto;
+}
+
+#top textarea{
+  width: 800px;
+  height: 75px;
+}
+
+p{
+  margin: 0px;
+  padding: 0px;
+}
+
+#bottom{
+  width: 800px;
+  margin: auto;
+}
+
+#bottom h4{
+  margin: 0px;
+  padding: 0px;
+}
+
+#bottom p, form{
+  display: inline-block;
+}
+
+#bottom textarea{
+  width: 700px;
+  height: 75px;
+}
+
+ul{
+  list-style-type: none;
+}

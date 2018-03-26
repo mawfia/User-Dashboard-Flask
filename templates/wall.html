@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>The Wall</title>
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/wall.css') }}">
+      <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/wall.js') }}"></script>
+   </head>
+   <body>
+     <div id="nav">
+       <h1>The Wall</h1><h3>Welcome {{user['first_name']}}</h3><a href="/">Account</a><a href="/logout">Logout</a>
+     </div>
+     <div id="wall">
+       <div id="top">
+         <p>Post a message</p>
+         <form action="/message" method="POST"><textarea name="message"></textarea><input type='submit' value='Post a message'></form>
+       </div>
+       <div id="bottom">
+       {% if messages %}
+         {% for message in messages %}
+           <h4>{{message['first_name']}} {{message['last_name']}} - {{message['date']}}</h4>
+           <p>{{message['message']}}</p>{% if session['user_id'] == message['user_id'] %}<form action="/message/{{message['id']}}/delete" method="POST"><input type='submit' value='Delete'>{% endif %}</form>
+             <ul>
+             {% if message['comments'] %}
+               {% for comment in message['comments'] %}
+                 <li><h4>{{comment['first_name']}} {{comment['last_name']}} - {{comment['date']}}</h4><p>{{comment['comment']}}</p>{% if session['user_id'] == comment['user_id'] %}<form action="/comment/{{comment['id']}}/delete" method="POST"><input type='submit' value='Delete'></form>{% endif %}</li>
+               {% endfor %}
+             {% endif %}
+             <li><p>Post a comment</p><form action="/comment/{{message['id']}}" method="POST"><textarea name="comment"></textarea><input type='submit' value='Post a comment'></form></li>
+             </ul>
+         {% endfor %}
+       {% endif %}
+     </div>
+    </div>
+   </body>
+</html>
