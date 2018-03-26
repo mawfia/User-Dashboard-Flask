@@ -186,7 +186,7 @@ def updateUser(user_id):
     errors += validateBirthdate(request.form['bdate'])
 
     if errors == 0:
-        if session['permission_level'] >= 2:
+        if session['permission_level'][0] >= 2:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate, permission_level = :permission_level WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'permission_level': request.form['permission_level'], 'id': user_id, }
             print request.form['permission_level']
