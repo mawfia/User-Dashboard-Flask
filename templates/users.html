@@ -41,7 +41,7 @@
              {% endfor %}
            {% endif %}
          </tbody>
-         <tfoot>{% if session['permission_level'] > 1 %}<tr><th><a href="/user/create">Add User</a></th></tr>{% endif %}</tfoot>
+         <tfoot>{% if session['permission_level'][0] > 1 %}<tr><th><a href="/user/create">Add User</a></th></tr>{% endif %}</tfoot>
        </table>
        <a href="/logout">Logout</a><a href="/wall">The Wall</a><a href="/">Account</a>
     </div>
