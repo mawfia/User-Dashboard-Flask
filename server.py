@@ -1,11 +1,13 @@
 import re
 import time
 import datetime
-import hashlib
+
 import os, binascii
 
 from flask import Flask, render_template, request, redirect, session, flash
 from mysqlconnection import MySQLConnector
+from hashlib import md5
+from User import User
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
@@ -14,18 +16,18 @@ PASSWORD_REGEX = re.compile(r'^(?=.*[0-9])(?=.*[A-Z])([a-zA-Z0-9!@#$%^&*()]{8,16
 app = Flask(__name__)
 app.secret_key = 'SecretKey'
 mysql = MySQLConnector(app,'RESTlite_Users_db')
+test = User()
 
 @app.route('/')
 def index():
   # Authenticate user session
   if session.get('user_id') == None:
-      session['permission_level'] = permissions(None)
+      session['permission_level'] = test.permissions(None).permissions_level
       return render_template('index.html')
-  else: return render_template('user.html', user=showUser(session['user_id']))
+  else: return render_template('user.html', user=test.showUser(session['user_id']))
 
 @app.route('/register', methods=['POST'])
 def register():
-
   errors = validateName(request.form['fname'], request.form['lname'])
   errors += validateEmail(request.form['email'])
   errors += validatePassword(request.form['password'], request.form['cpassword'])
@@ -40,8 +42,8 @@ def register():
     data = { 'first_name': request.form['fname'], 'last_name': request.form['lname'], 'email': request.form['email'],'password': SHP['shpassword'], 'salt': SHP['salt'], 'birthdate':request.form['bdate'], }
     # Run query, with dictionary values injected into the query.
     session['user_id'] = mysql.query_db(query, data)
-    account = showUser(session['user_id'])
-    session['permission_level'] = permissions(account['permission_level'])
+    account = test.showUser(session['user_id'])
+    session['permission_level'] = test.permissions(account['permission_level']).permissions_level
     return render_template('user.html', user=account)
   else: return render_template('index.html', fname=request.form['fname'], lname=request.form['lname'], email=request.form['email'], bdate=request.form['bdate'])
 
@@ -100,18 +102,20 @@ def verifyUser(email):
 # Salt and Hash password
 def SHPassword(password):
     salt = binascii.b2a_hex(os.urandom(15))
-    shpassword = md5.new(password + salt).hexdigest()
+    shpassword = md5((password + salt).encode('utf-8')).hexdigest()
     return {'shpassword':shpassword, 'salt': salt}
 
 # Compate Salt and Hash password with password given
 def deSHPassword(password, shpassword, salt):
-    if shpassword == md5.new(password + salt).hexdigest() : return True
+    if shpassword == md5((password + salt).encode('utf-8')).hexdigest() : return True
     else: return False
 
 def showUser(user_id):
     query = "SELECT id, first_name, last_name, email, DATE_FORMAT(birthdate, '%Y-%m-%d') AS birthdate, permission_level, created_at, updated_at FROM users WHERE id = :id"
     data = {'id':user_id}
     result = mysql.query_db(query, data)
+
+
     if len(result) != 0 :
         result[0]['permission_level'] = permissions(result[0]['permission_level'])
         return result[0]
@@ -120,10 +124,10 @@ def showUser(user_id):
 @app.route('/user/<user_id>')
 def showOtherUser(user_id):
     if session.get('user_id') == None: return redirect('/')
-
+    other_user = User()
     #permissions = ['Guest', 'Basic','Admin Level 1','Admin Level 2']
     #permissions=permissions[0:session['permission_level'][0]]
-    return render_template('user.html', user=showUser(user_id))
+    return render_template('user.html', user=other_user.showUser(user_id))
 
 @app.route('/users')
 def showUsers():
@@ -199,6 +203,7 @@ def updateUser(user_id):
 
 @app.route('/login', methods=['POST'])
 def login():
+  print(test.permission_level)
 
   errors = 0
   if not EMAIL_REGEX.match(request.form['email']):
@@ -239,7 +244,7 @@ def logout():
 def wall():
     if session.get('user_id') == None: return redirect('/')
 
-    return render_template('wall.html', messages=showMessages(), user=showUser(session['user_id']))
+    return render_template('wall.html', messages=showMessages(), user=test.showUser(session['user_id']))
 
 def showMessages():
     query = "SELECT messages.id, messages.user_id, messages.message, users.first_name, users.last_name, DATE_FORMAT(messages.created_at, '%M %D %Y') AS date FROM users, messages WHERE users.id = messages.user_id"
