@@ -45,9 +45,9 @@ def register():
     return render_template('user.html', user=account)
   else: return render_template('index.html', fname=request.form['fname'], lname=request.form['lname'], email=request.form['email'], bdate=request.form['bdate'])
 
-def authenticate(destination):
+def authenticate():
     if session.get('user_id') == None: return redirect('/')
-    elif destination: return redirect(destination)
+    #elif destination: return redirect(destination)
 
 def validateName(fname, lname):
     if not NAME_REGEX.match(fname) or not NAME_REGEX.match(lname):
@@ -127,8 +127,9 @@ def showOtherUser(user_id):
 
 @app.route('/users')
 def showUsers():
-    if session.get('user_id') == None: return redirect('/')
+    print "test"
 
+    if session.get('user_id') == None: return redirect('/')
     query = "SELECT id, first_name, last_name, email, DATE_FORMAT(birthdate, '%Y-%m-%d') AS birthdate, permission_level, DATE_FORMAT(created_at, '%Y-%m-%d') AS created_at, DATE_FORMAT(updated_at, '%Y-%m-%d') AS updated_at FROM users"
     users = mysql.query_db(query, data=None)
     for user in users:
@@ -189,7 +190,6 @@ def updateUser(user_id):
         if session['permission_level'][0] >= 2:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate, permission_level = :permission_level WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'permission_level': request.form['permission_level'], 'id': user_id, }
-            print request.form['permission_level']
         else:
             query = "UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, birthdate = :birthdate WHERE id = :id"
             data = { 'first_name': request.form['fname'], 'last_name':  request.form['lname'], 'email': request.form['email'], 'birthdate': request.form['bdate'], 'id': user_id, }
@@ -257,7 +257,7 @@ def showMessages():
 
 @app.route('/message', methods=['POST'])
 def createMessage():
-    authenticate(None)
+    authenticate()
 
     query = "INSERT INTO messages (user_id, message, created_at) VALUES (:user_id, :message, NOW())"
     data = { 'user_id': session['user_id'], 'message': request.form['message'], }
@@ -266,7 +266,7 @@ def createMessage():
 
 @app.route('/message/<message_id>/delete', methods=['POST'])
 def deleteMessage(message_id):
-    authenticate('/wall')
+    authenticate()
 
     query = "DELETE FROM comments WHERE message_id = :message_id"
     data = { 'message_id': message_id, }
@@ -279,7 +279,7 @@ def deleteMessage(message_id):
 
 @app.route('/comment/<comment_id>/delete', methods=['POST'])
 def deleteComment(comment_id):
-    authenticate('/wall')
+    authenticate()
 
     query = "DELETE FROM comments WHERE id = :comment_id"
     data = { 'comment_id': comment_id, }
@@ -288,7 +288,7 @@ def deleteComment(comment_id):
 
 @app.route('/comment/<message_id>', methods=['POST'])
 def createComment(message_id):
-    authenticate(None)
+    authenticate()
 
     query = "INSERT INTO comments (user_id, message_id, comment, created_at) VALUES (:user_id, :message_id, :comment, NOW())"
     data = { 'user_id': session['user_id'], 'message_id': message_id, 'comment': request.form['comment'], }
