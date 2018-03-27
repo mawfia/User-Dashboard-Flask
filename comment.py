@@ -3,10 +3,6 @@ from mysqlconnection import MySQLConnector
 from user import *
 from message import *
 
-app = Flask(__name__)
-app.secret_key = 'SecretKey'
-mysql = MySQLConnector(app,'RESTlite_Users_db')
-
 comments = Blueprint('comments', __name__, template_folder='templates')
 comment = Blueprint('comment', __name__, template_folder='templates')
 

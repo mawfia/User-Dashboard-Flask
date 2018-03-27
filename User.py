@@ -5,7 +5,6 @@ import datetime
 from flask import Blueprint, Flask, render_template, request, redirect, session, flash
 from mysqlconnection import MySQLConnector
 from hashlib import md5
-from message import *
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
@@ -16,6 +15,7 @@ mysql = MySQLConnector(app,'RESTlite_Users_db')
 
 users = Blueprint('users', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
+
 
 @user.route('/')
 def index():

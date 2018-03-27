@@ -9,22 +9,24 @@ from hashlib import md5
 from user import *
 from message import *
 from comment import *
+from wall import *
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
 PASSWORD_REGEX = re.compile(r'^(?=.*[0-9])(?=.*[A-Z])([a-zA-Z0-9!@#$%^&*()]{8,16})$')
 
+
 app = Flask(__name__)
+app.secret_key = 'SecretKey'
+mysql = MySQLConnector(app,'RESTlite_Users_db')
+
 app.register_blueprint(users, url_prefix='/users')
 app.register_blueprint(user, url_prefix='/user')
+app.register_blueprint(wall, url_prefix='/wall')
 app.register_blueprint(messages, url_prefix='/messages')
 app.register_blueprint(message, url_prefix='/message')
 app.register_blueprint(comments, url_prefix='/comments')
 app.register_blueprint(comment, url_prefix='/comment')
-
-app.secret_key = 'SecretKey'
-mysql = MySQLConnector(app,'RESTlite_Users_db')
-
 
 @app.route('/')
 def index():
@@ -125,11 +127,7 @@ def logout():
     session['permission_level'] = None
     return redirect('/')
 
-@app.route('/wall')
-def wall():
-    if session.get('user_id') == None: return redirect('/')
 
-    return render_template('wall.html', messages=showMessages(), user=showUser(session['user_id']))
 
 @app.route('/', defaults={'path':''})
 @app.route('/<path:path>')

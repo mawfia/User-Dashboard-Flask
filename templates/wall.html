@@ -40,7 +40,7 @@
                  </li>
                {% endfor %}
              {% endif %}
-             <li><p>Post a comment</p><form action="/comment/{{message['id']}}" method="POST"><textarea name="comment"></textarea><input type='submit' value='Post a comment'></form></li>
+             <li><form action="/comment/{{message['id']}}" method="POST"><textarea name="comment"></textarea><input type='submit' value='Post a comment'></form></li>
              </ul>
          {% endfor %}
        {% endif %}
