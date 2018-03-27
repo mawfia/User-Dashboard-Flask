@@ -19,7 +19,27 @@ user = Blueprint('user', __name__, template_folder='templates')
 
 @user.route('/')
 def index():
-    return render_template('user.html', user=showUser(session['user_id']))
+    return render_template('user.html', messages=userMessages(session['user_id']), user=showUser(session['user_id']))
+
+def userMessages(user_id):
+
+    query = "SELECT messages.id, users.id AS user_id, users_messages.id AS um_id, messages.message, users.first_name, users.last_name, DATE_FORMAT(messages.created_at, '%M %D %Y') AS date FROM users, messages, users_messages, (SELECT messages.id, COUNT(*) AS count FROM users, messages, users_messages WHERE users.id = users_messages.user_id AND users_messages.message_id = messages.id GROUP BY messages.id HAVING count = 2) AS um WHERE messages.id = um.id AND users_messages.message_id = um.id AND users_messages.user_id = users.id;"
+    results = mysql.query_db(query, data={"user_id":user_id})
+    messages = []
+    for m in range(0,len(results),2):
+        if results[m+1]['user_id'] == int(user_id) and results[m+1]['um_id'] > results[m]['um_id']:
+            messages.append(results[m])
+            messages[len(messages)-1]['from_id'] = results[m]['user_id']
+            messages[len(messages)-1]['to_id'] = results[m+1]['user_id']
+    if len(messages) > 0:
+        for message in messages:
+            query = "SELECT comments.id, comments.user_id, comments.message_id, comments.comment, users.first_name, users.last_name, DATE_FORMAT(comments.created_at, '%M %D %Y') AS date FROM users, comments WHERE comments.message_id = :message_id AND users.id = comments.user_id"
+            data = { 'message_id': message['id'] }
+            comments = mysql.query_db(query, data)
+            if len(comments) > 0: message['comments'] = comments
+            else: message['comments'] = []
+        return messages
+    else: return []
 
 def permissions(level):
   if level == None or level == 0: permissions_level = [0,'Guest']
@@ -63,7 +83,7 @@ def showUser(user_id):
 def showOtherUser(user_id):
   if session.get('user_id') == None: return redirect('/')
   elif session['user_id'] == int(user_id): return redirect('/user')
-  else: return render_template('user.html', user=showUser(user_id))
+  else: return render_template('user.html', messages=userMessages(user_id), user=showUser(user_id))
 
 @users.route('/')
 def showUsers():

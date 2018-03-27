@@ -7,8 +7,9 @@ from user import *
 messages = Blueprint('messages', __name__, template_folder='templates')
 message = Blueprint('message', __name__, template_folder='templates')
 
+@message.route('/create/<user_id>', methods=['POST'])
 @message.route('/create', methods=['POST'])
-def create():
+def create(user_id=None):
     if session.get('user_id') == None: return redirect('/')
 
     data = { 'message': request.form['message'], }
@@ -16,8 +17,14 @@ def create():
     query = "INSERT INTO users_messages (user_id, message_id) VALUES (:user_id, :message_id)"
     data = { 'user_id': session['user_id'], 'message_id': message_id }
     mysql.query_db(query, data)
+    if user_id == None: return redirect('/wall')
+    else:
+        query = "INSERT INTO users_messages (user_id, message_id) VALUES (:user_id, :message_id)"
+        data = { 'user_id': user_id, 'message_id': message_id }
+        mysql.query_db(query, data)
+        return redirect('/wall/' + user_id)
 
-    return redirect('/wall')
+
 
 @message.route('/<message_id>/delete', methods=['POST'])
 def destroy(message_id):
