@@ -1,14 +1,6 @@
-import re
-import time
-import datetime
-
 from flask import Blueprint, Flask, render_template, request, redirect, session, flash
 from mysqlconnection import MySQLConnector
-from hashlib import md5
 from user import *
-
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
-NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
 
 app = Flask(__name__)
 app.secret_key = 'SecretKey'

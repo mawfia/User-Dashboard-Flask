@@ -1,7 +1,6 @@
 import re
 import time
 import datetime
-
 import os, binascii
 
 from flask import Blueprint, Flask, render_template, request, redirect, session, flash
@@ -9,6 +8,7 @@ from mysqlconnection import MySQLConnector
 from hashlib import md5
 from user import *
 from message import *
+from comment import *
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
@@ -19,6 +19,8 @@ app.register_blueprint(users, url_prefix='/users')
 app.register_blueprint(user, url_prefix='/user')
 app.register_blueprint(messages, url_prefix='/messages')
 app.register_blueprint(message, url_prefix='/message')
+app.register_blueprint(comments, url_prefix='/comments')
+app.register_blueprint(comment, url_prefix='/comment')
 
 app.secret_key = 'SecretKey'
 mysql = MySQLConnector(app,'RESTlite_Users_db')
@@ -58,7 +60,7 @@ def validateEmail(email):
     if not EMAIL_REGEX.match(email):
        flash("Invalid Email Address!")
        errors = 1
-    elif len(verifyUser(email)) != 0:
+    elif len(validateUser(email)) != 0:
        flash("Username/email '{}', already exists.".format(email))
        return errors + 1
     else: return errors
@@ -74,7 +76,7 @@ def validatePassword(password, cpassword):
 
     return errors
 
-def verifyUser(email):
+def validateUser(email):
     query = "SELECT id, email, password, salt, permission_level FROM users WHERE email = :email"
     data = {'email':email}
     result = mysql.query_db(query, data)
@@ -104,7 +106,7 @@ def login():
     errors = 1
 
   if errors == 0:
-    user = verifyUser(request.form['email'])
+    user = validateUser(request.form['email'])
 
     if len(user) == 0: flash("Login unsuccessful. Username/email '{}', not found.".format(request.form['email']))
     elif deSHPassword(request.form['password'], user['password'], user['salt']) == False: flash("Login unsuccessful. Incorrect password.")
@@ -128,24 +130,6 @@ def wall():
     if session.get('user_id') == None: return redirect('/')
 
     return render_template('wall.html', messages=showMessages(), user=showUser(session['user_id']))
-
-@app.route('/comment/<comment_id>/delete', methods=['POST'])
-def deleteComment(comment_id):
-    if session.get('user_id') == None: return redirect('/')
-
-    query = "DELETE FROM comments WHERE id = :comment_id"
-    data = { 'comment_id': comment_id, }
-    mysql.query_db(query, data)
-    return redirect('/wall')
-
-@app.route('/comment/<message_id>', methods=['POST'])
-def createComment(message_id):
-    if session.get('user_id') == None: return redirect('/')
-
-    query = "INSERT INTO comments (user_id, message_id, comment, created_at) VALUES (:user_id, :message_id, :comment, NOW())"
-    data = { 'user_id': session['user_id'], 'message_id': message_id, 'comment': request.form['comment'], }
-    mysql.query_db(query, data)
-    return redirect('/wall')
 
 @app.route('/', defaults={'path':''})
 @app.route('/<path:path>')

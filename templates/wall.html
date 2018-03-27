@@ -18,12 +18,26 @@
        <div id="bottom">
        {% if messages %}
          {% for message in messages %}
-           <h4>{{message['first_name']}} {{message['last_name']}} - {{message['date']}}</h4>
+            {% if message['user_id'] == user['id'] %}
+                <h4>{{message['first_name']}} {{message['last_name']}} - {{message['date']}}</h4>
+           {% else %}
+                <h4><a href="/user/{{message['user_id']}}">{{message['first_name']}} {{message['last_name']}}</a> - {{message['date']}}</h4>
+           {% endif %}
            <p>{{message['message']}}</p>{% if session['user_id'] == message['user_id'] %}<form action="/message/{{message['id']}}/delete" method="POST"><input type='submit' value='Delete'>{% endif %}</form>
              <ul>
              {% if message['comments'] %}
                {% for comment in message['comments'] %}
-                 <li><h4>{{comment['first_name']}} {{comment['last_name']}} - {{comment['date']}}</h4><p>{{comment['comment']}}</p>{% if session['user_id'] == comment['user_id'] %}<form action="/comment/{{comment['id']}}/delete" method="POST"><input type='submit' value='Delete'></form>{% endif %}</li>
+                 <li>
+                     {% if comment['user_id'] == user['id'] %}
+                        <h4>{{comment['first_name']}} {{comment['last_name']}} - {{comment['date']}}</h4>
+                     {% else %}
+                        <h4><a href="/user/{{comment['user_id']}}">{{comment['first_name']}} {{comment['last_name']}}</a> - {{comment['date']}}</h4>
+                     {% endif %}
+                     <p>{{comment['comment']}}</p>
+                     {% if session['user_id'] == comment['user_id'] %}
+                        <form action="/comment/{{comment['id']}}/delete" method="POST"><input type='submit' value='Delete'></form>
+                     {% endif %}
+                 </li>
                {% endfor %}
              {% endif %}
              <li><p>Post a comment</p><form action="/comment/{{message['id']}}" method="POST"><textarea name="comment"></textarea><input type='submit' value='Post a comment'></form></li>
