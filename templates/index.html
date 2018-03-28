@@ -15,8 +15,8 @@
                <label for="lname">Last Name:</label><input type='text' name='lname' value="{{lname}}">
                <label for="email">Email:</label><input type='email' name='email' value="{{email}}" placeholder="username">
                <label for="password">Password:</label><input type='password' name='password'>
-               <label for"cpassword">Confirm Password:</label><input type='password' name='cpassword'>
-               <label for"bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
+               <label for="cpassword">Confirm Password:</label><input type='password' name='cpassword'>
+               <label for="bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
                <input type='submit' value='Register'><input type="reset" value="Reset">
            </form>
        </div>
@@ -27,8 +27,8 @@
                <label for="lname">Last Name:</label><input type='text' name='lname' value="{{lname}}">
                <label for="email">Email:</label><input type='email' name='email' value="{{email}}" placeholder="username">
                <label for="password">Password:</label><input type='password' name='password'>
-               <label for"cpassword">Confirm Password:</label><input type='password' name='cpassword'>
-               <label for"bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
+               <label for="cpassword">Confirm Password:</label><input type='password' name='cpassword'>
+               <label for="bdate">Birthdate:</label><input type="date" name="bdate" value="{{bdate}}" required>
                {% if session['permission_level'][0] > 2 %}
                {% set permissions = [[0,'Guest'],[1,'Basic'],[2,'Admin Level 1'],[3,'Admin Level 2']] %}
                  <label for="permission_level">Permission Level:</label>

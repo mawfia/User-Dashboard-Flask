@@ -22,9 +22,7 @@ def create(user_id=None):
         query = "INSERT INTO users_messages (user_id, message_id) VALUES (:user_id, :message_id)"
         data = { 'user_id': user_id, 'message_id': message_id }
         mysql.query_db(query, data)
-        return redirect('/wall/' + user_id)
-
-
+        return redirect('/user/' + user_id)
 
 @message.route('/<message_id>/delete', methods=['POST'])
 def destroy(message_id):

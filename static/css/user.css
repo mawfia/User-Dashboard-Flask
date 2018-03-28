@@ -1,27 +1,13 @@
-form{
-    width: 300px;
-    height: auto;
+#user{
+    width: 49%;
+    display: inline-block;
 }
 
-input{
-    margin-top: 15px;
+#errors{
+    width: 49%;
+    display: inline-block;
 }
 
-input:nth-of-type(1){
-    margin-left: 65px;
-}
-
-input:nth-of-type(2){
-    margin-left: 67px;
-}
-
-input:nth-of-type(3){
-    margin-left: 98px;
-}
-
-input:nth-of-type(4){
-    margin-left: 74px;
-}
 
 #top{
   width: 800px;

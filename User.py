@@ -17,13 +17,17 @@ users = Blueprint('users', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
 
 
+@user.route('/<user_id>')
 @user.route('/')
-def index():
-    return render_template('user.html', messages=userMessages(session['user_id']), user=showUser(session['user_id']))
+def index(user_id=None):
+    if session.get('user_id') == None: return redirect('/')
+    messages = (userMessages(session['user_id']) if user_id==None  else userMessages(user_id))
+    user = (showUser(session['user_id']) if ((user_id==None) or (session['user_id'] == int(user_id))) else showUser(user_id))
+    return render_template('user.html', messages=messages, user=user)
 
 def userMessages(user_id):
 
-    query = "SELECT messages.id, users.id AS user_id, users_messages.id AS um_id, messages.message, users.first_name, users.last_name, DATE_FORMAT(messages.created_at, '%M %D %Y') AS date FROM users, messages, users_messages, (SELECT messages.id, COUNT(*) AS count FROM users, messages, users_messages WHERE users.id = users_messages.user_id AND users_messages.message_id = messages.id GROUP BY messages.id HAVING count = 2) AS um WHERE messages.id = um.id AND users_messages.message_id = um.id AND users_messages.user_id = users.id;"
+    query = "SELECT messages.id, users.id AS user_id, users_messages.id AS um_id, messages.message, users.first_name, users.last_name, DATE_FORMAT(messages.created_at, '%M %D %Y') AS date FROM users, messages, users_messages, (SELECT messages.id, COUNT(*) AS count FROM users, messages, users_messages WHERE users.id = users_messages.user_id AND users_messages.message_id = messages.id GROUP BY messages.id HAVING count = 2) AS um WHERE messages.id = um.id AND users_messages.message_id = um.id AND users_messages.user_id = users.id ORDER BY um_id ASC;"
     results = mysql.query_db(query, data={"user_id":user_id})
     messages = []
     for m in range(0,len(results),2):
@@ -36,7 +40,8 @@ def userMessages(user_id):
             query = "SELECT comments.id, comments.user_id, comments.message_id, comments.comment, users.first_name, users.last_name, DATE_FORMAT(comments.created_at, '%M %D %Y') AS date FROM users, comments WHERE comments.message_id = :message_id AND users.id = comments.user_id"
             data = { 'message_id': message['id'] }
             comments = mysql.query_db(query, data)
-            if len(comments) > 0: message['comments'] = comments
+            if len(comments) > 0:
+                message['comments'] = comments
             else: message['comments'] = []
         return messages
     else: return []

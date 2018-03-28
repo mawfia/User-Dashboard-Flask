@@ -26,7 +26,6 @@ def showMessages(user_id=None):
                 messages.append(results[m])
                 messages[len(messages)-1]['user_from'] = results[m]['user_id']
                 messages[len(messages)-1]['user_to'] = results[m+1]['user_id']
-            print(messages)
     if len(messages) > 0:
         for message in messages:
             comments = showComments(message['id'])
