@@ -1,4 +1,4 @@
-Coding Dojo (Python/Flask) - User Dashboard Assignment Project created 26 March 2018 and still under development
+Coding Dojo (Python/Flask) - User Dashboard/Wall Assignment created 26 March 2018 and still under development
 
 INTRODUCTION:
 --------------------
@@ -7,17 +7,18 @@ This is a Flask/Python project being designed, built, and deployed to cloud serv
 INTRO:
 --------------------
 
--This application was built as preparation for the Coding Dojo Belt exam culminating 2 months of material including HTML, CSS, JavaScript, 
+-This application is an amalgamation between assignments User Dashboard and The Wall (mockups below) built as preparation for the Coding Dojo Belt exam, culminating 2 months of material including HTML, CSS, JavaScript, 
 jQuery, Ajax, Python, Flask, Django and the various ways of using these technologies to develop a modern day application.  As the 
 practice for a belt exam we spend no more than 48 hours from start and finsh for an application including testing and deployment with the following requirements:
 
-1. Login and Registration with validations. Validation errors should appear on the page. Logout as well. Password should be at least 8 characters and not stored in plain text.
+1. Login and Registration that is displayed when the user navigates to the main URL. Validation errors should appear on each page with a form. Logout as well. Password should be at least 8 characters and not stored in plain text.
 2. Display the logged users account information; also displays other users' accounts. Display should be specific per user.
 3. Ability to view other users pages. Once the logged user joins they shoudl have access according to their permissions to update, delete or view messages on other users pages.
 4. Display of a particular travel plan which also indicates the list of users who joined that plan.
 5. You must be able to deploy your work to Amazon EC2 and provide the IP address or subdomain/domain name to where your work has been deployed.
 
 ![Image of Dashboard](http://mawfia.com/documents/user_dashboard.jpg)
+![Image of Dashboard](http://mawfia.com/documents/flask_wall.png)
 
 
 HOW TO USE:
