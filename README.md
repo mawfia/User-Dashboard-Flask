@@ -13,9 +13,8 @@ practice for a belt exam we spend no more than 48 hours from start and finsh for
 
 1. Login and Registration that is displayed when the user navigates to the main URL. Validation errors should appear on each page with a form. Logout as well. Password should be at least 8 characters and not stored in plain text.
 2. Display the logged users account information; also displays other users' accounts. Display should be specific per user.
-3. Ability to view other users pages. Once the logged user joins they shoudl have access according to their permissions to update, delete or view messages on other users pages.
-4. Display of a particular travel plan which also indicates the list of users who joined that plan.
-5. You must be able to deploy your work to Amazon EC2 and provide the IP address or subdomain/domain name to where your work has been deployed.
+3. Ability to view other users pages. Once the logged user joins they should have access according to their permissions to update, delete or view messages on other users pages.
+4. You must be able to deploy your work to Amazon EC2 and provide the IP address or subdomain/domain name to where your work has been deployed.
 
 ![Image of Dashboard](http://mawfia.com/documents/user_dashboard.jpg)
 ![Image of Dashboard](http://mawfia.com/documents/flask_wall.png)
