@@ -1,5 +1,4 @@
-Coding Dojo (Python/Flask) - User Dashboard Assignment
-Individual Belt Exam Project created 26 March 2018 and still under development
+Coding Dojo (Python/Flask) - User Dashboard Assignment Project created 26 March 2018 and still under development
 
 INTRODUCTION:
 --------------------
