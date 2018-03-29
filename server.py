@@ -11,10 +11,7 @@ from message import *
 from comment import *
 from wall import *
 
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
-NAME_REGEX = re.compile(r'^[a-zA-Z-]{2,20}$')
 PASSWORD_REGEX = re.compile(r'^(?=.*[0-9])(?=.*[A-Z])([a-zA-Z0-9!@#$%^&*()]{8,16})$')
-
 
 app = Flask(__name__)
 app.secret_key = 'SecretKey'
@@ -38,6 +35,8 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
+  if 'user_id' in session: return redirect('/user')
+
   errors = validateName(request.form['fname'], request.form['lname'])
   errors += validateEmail(request.form['email'])
   errors += validatePassword(request.form['password'], request.form['cpassword'])
@@ -57,33 +56,18 @@ def register():
     return render_template('user.html', user=account)
   else: return render_template('index.html', fname=request.form['fname'], lname=request.form['lname'], email=request.form['email'], bdate=request.form['bdate'])
 
-def validateEmail(email):
+def validatePassword(password, cpassword, login=False):
     errors = 0
-    if not EMAIL_REGEX.match(email):
-       flash("Invalid Email Address!")
-       errors = 1
-    elif len(validateUser(email)) != 0:
-       flash("Username/email '{}', already exists.".format(email))
-       return errors + 1
-    else: return errors
 
-def validatePassword(password, cpassword):
-    errors = 0
-    if password != cpassword:
-        flash("Passwords do not match.")
-        errors = 1
-    elif not PASSWORD_REGEX.match(request.form['password']):
+    if not PASSWORD_REGEX.match(request.form['password']):
         flash("Password must be 8-16 characters and contain at least one upper case letter and one number.")
+        errors = 1
+    if login == True: return errors
+    elif password != cpassword:
+        flash("Passwords do not match.")
         errors += 1
 
     return errors
-
-def validateUser(email):
-    query = "SELECT id, email, password, salt, permission_level FROM users WHERE email = :email"
-    data = {'email':email}
-    result = mysql.query_db(query, data)
-    if len(result) != 0 : return result[0]
-    else: return []
 
 # Salt and Hash password
 def SHPassword(password):
@@ -98,14 +82,10 @@ def deSHPassword(password, shpassword, salt):
 
 @app.route('/login', methods=['POST'])
 def login():
+  if 'user_id' in session: return redirect('/user')
 
-  errors = 0
-  if not EMAIL_REGEX.match(request.form['email']):
-    flash("Invalid Email Address!")
-    errors = 1
-  if not PASSWORD_REGEX.match(request.form['password']):
-    flash("Password must be 8-16 characters and contain at least one upper case letter and one number.")
-    errors = 1
+  errors = validateEmail(request.form['email'], True)
+  errors += validatePassword(request.form['password'], None, True)
 
   if errors == 0:
     user = validateUser(request.form['email'])
@@ -123,11 +103,10 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session['user_id'] = None
-    session['permission_level'] = None
+    if 'user_id' in session:
+        del session['user_id']
+        del session['permission_level']
     return redirect('/')
-
-
 
 @app.route('/', defaults={'path':''})
 @app.route('/<path:path>')

@@ -21,8 +21,10 @@ user = Blueprint('user', __name__, template_folder='templates')
 @user.route('/')
 def index(user_id=None):
     if session.get('user_id') == None: return redirect('/')
+    elif session['user_id'] == user_id: return redirect('/user')
+
     messages = (userMessages(session['user_id']) if user_id==None  else userMessages(user_id))
-    user = (showUser(session['user_id']) if ((user_id==None) or (session['user_id'] == int(user_id))) else showUser(user_id))
+    user = (showUser(session['user_id']) if user_id==None else showUser(user_id))
     return render_template('user.html', messages=messages, user=user)
 
 def userMessages(user_id):
@@ -56,7 +58,7 @@ def permissions(level):
 
 def validateBirthdate(ubdate): # takes unicoded birthdate as input
   date = datetime.datetime.fromtimestamp(time.time()).strftime('%m/%d/%Y').split('/') # todays date
-  ebdate = ubdate.split('-') #encoded birthdate
+  ebdate = ubdate.split('-')
 
   errors = 0
   if datetime.datetime(int(date[2])-18,int(date[0]),int(date[1])) <= datetime.datetime(int(ebdate[0]), int(ebdate[1]), int(ebdate[2])):
@@ -66,6 +68,24 @@ def validateBirthdate(ubdate): # takes unicoded birthdate as input
     flash("Birthdate selected {}, out of range 18-130.".format(ubdate))
     errors += 1
 
+  return errors
+
+def validateUser(email):
+  query = "SELECT id, email, password, salt, permission_level FROM users WHERE email = :email"
+  data = {'email':email}
+  result = mysql.query_db(query, data)
+  if len(result) != 0 : return result[0]
+  else: return []
+
+def validateEmail(email, login=False):
+  errors = 0
+  if not EMAIL_REGEX.match(email):
+     flash("Invalid Email Address!")
+     errors = 1
+  elif login == True: return errors
+  elif len(validateUser(email)) != 0:
+     flash("Username/email '{}', already exists.".format(email))
+     errors += 1
   return errors
 
 def validateName(fname, lname):
@@ -84,12 +104,6 @@ def showUser(user_id):
       return result[0]
   else: return []
 
-@user.route('/<user_id>')
-def showOtherUser(user_id):
-  if session.get('user_id') == None: return redirect('/')
-  elif session['user_id'] == int(user_id): return redirect('/user')
-  else: return render_template('user.html', messages=userMessages(user_id), user=showUser(user_id))
-
 @users.route('/')
 def showUsers():
     if session.get('user_id') == None: return redirect('/')
@@ -101,11 +115,11 @@ def showUsers():
     return render_template('users.html', users=users)
 
 @user.route('/<user_id>/update', methods=['POST'])
-def updateUser(user_id):
+def update(user_id):
     if session.get('user_id') == None: return redirect('/')
 
     errors = validateName(request.form['fname'], request.form['lname'])
-    if not EMAIL_REGEX.match(request.form['email']): errors += 1
+    errors += validateEmail(request.form['email'])
     errors += validateBirthdate(request.form['bdate'])
 
     if errors == 0:

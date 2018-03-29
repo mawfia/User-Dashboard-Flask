@@ -1,12 +1,41 @@
 #user{
     width: 49%;
     display: inline-block;
+    height: 300px;
+}
+
+#menu{
+    width: 49%;
+    display: inline-block;
+    vertical-align: top;
+    height: 300px;
 }
 
 #errors{
+    margin-top: 75px;
+    color: red;
+}
+
+#update{
     width: 49%;
     display: inline-block;
+    height: 300px;
 }
+
+#update form{
+        width: 500px;
+}
+
+#update label{
+    display: inline-block;
+    width: 200px;
+}
+
+#update input:nth-of-type(1), input:nth-of-type(2), input:nth-of-type(3), input:nth-of-type(4){
+    width: 250px;
+}
+
+
 
 
 #top{

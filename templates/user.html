@@ -46,15 +46,17 @@
           <input type='submit' value='Submit'><input type="reset" value="Reset"><button type="button">Cancel</button>
       </form>
    </div>
-   <div id="errors">
+   <div id="menu">
     <a href="/logout">Logout</a><a href="/wall">The Wall</a><a href="/users">User Accounts</a>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-             {% for message in messages %}
-             <p>{{message}}</p>
-             {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div id=errors>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                 {% for message in messages %}
+                 <p>{{message}}</p>
+                 {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
     </div>
     <div id="wall">
       <div id="top">
